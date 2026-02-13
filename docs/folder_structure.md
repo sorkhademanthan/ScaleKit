@@ -1,56 +1,50 @@
-# 📂 The "Structural Blueprint" (Folder Map)
+# 📂 The "Structural Blueprint" (Folder Map) - v2.0
 
 This is the defined file structure for **ScaleKit**. All code should strictly follow these locations.
 
 ```plaintext
 scalekit/
 ├── .github/                    # CI/CD Workflows
-├── docs/                       # 📄 Documentation (You are here)
+├── content/                    # 📄 DOCS CONTENT (MDX Files)
+│   └── docs/                   # Markdown files for the website
+│       ├── auth/
+│       ├── security/
+│       └── database/
+│
+├── docs/                       # 📄 INTERNAL PROJECT DOCS (Overview, Standards)
 ├── docker/                     # Docker Configs
 ├── public/                     # Static Assets
 ├── scripts/                    # Maintenance Scripts
 │
-├── src/                        # 🧠 THE BRAIN (All Logic is Here)
-│   ├── app/                    # 🌐 ROUTING LAYER
-│   │   ├── (auth)/             # Login/Register Pages
-│   │   ├── (dashboard)/        # Protected App Routes
-│   │   ├── api/                # API Gateway
-│   │   │   └── v1/             # Versioned Endpoints
-│   │   ├── globals.css         # Tailwind Imports
-│   │   ├── layout.tsx          # Root Layout
-│   │   └── page.tsx            # Landing Page
-│   │
-│   ├── config/                 # ⚙️ CONFIGURATION
-│   │   └── env.ts              # Zod-validated Environment Vars
-│   │
-│   ├── core/                   # 🧱 SHARED KERNEL
-│   │   ├── utils/              # cn.ts (Tailwind merge helper)
-│   │   ├── errors/             # Custom Error Classes
-│   │   └── middleware/         # Global Middleware
-│   │
-│   ├── db/                     # 🗄️ DATABASE LAYER
-│   │   ├── schema/             # Drizzle Table Definitions
-│   │   ├── migrations/         # SQL History
-│   │   ├── seeds/              # Fake Data Generators
-│   │   └── index.ts            # DB Connection Pool
-│   │
-│   ├── emails/                 # 📧 COMMUNICATION
-│   │   └── templates/          # React-Email Components
-│   │
-│   ├── lib/                    # 📚 EXTERNAL ADAPTERS
-│   │   └── redis.ts            # Redis Connection
-│   │
-│   ├── modules/                # 🚀 BUSINESS LOGIC (The "ProdStack")
-│   │   ├── auth/               # Module 1: Authentication
-│   │   ├── communication/      # Module 3: Realtime
-│   │   ├── jobs/               # Module 5: Queues
-│   │   └── storage/            # Module 4: Uploads
-│   │
-│   └── test/                   # 🧪 TESTING
-│       ├── integration/
-│       └── unit/
+├── registry/                   # 🏭 THE WAREHOUSE (Raw Backend Components)
+│   ├── auth/                   # Auth components (JWT, RBAC)
+│   ├── security/               # Security components (Rate Limiters)
+│   ├── database/               # DB patterns (Pagination)
+│   └── shared/                 # Shared utilities for components
 │
-├── .env                        # Secrets (Database URL, JWT Secret)
+├── src/                        # 🌐 THE STOREFRONT (Documentation Website)
+│   ├── app/                    # ROUTING LAYER
+│   │   ├── (marketing)/        # Landing Page
+│   │   ├── docs/               # Documentation Routes ([...slug])
+│   │   ├── api/                # API for Registry JSON (if needed)
+│   │   ├── globals.css         # Tailwind Imports
+│   │   └── layout.tsx          # Root Layout
+│   │
+│   ├── components/             # UI COMPONENTS (For the Website)
+│   │   ├── ui/                 # Core UI (Buttons, Sidebar)
+│   │   ├── mdx/                # MDX Components (CodeBlock, etc.)
+│   │   └── layout/             # Header, Sidebar, TOC
+│   │
+│   ├── config/                 # SITE CONFIG
+│   │   └── site.ts             # Navigation menus, Metadata
+│   │
+│   ├── lib/                    # UTILS
+│   │   └── utils.ts            # cn helper
+│   │
+│   └── styles/                 # Extra styles
+│
+├── registry.json               # � THE MANIFEST (Maps components to files)
+├── .env                        # Secrets
 ├── drizzle.config.ts           # Drizzle Kit Config
 ├── next.config.ts              # Next.js Config
 ├── package.json                # Dependencies List
