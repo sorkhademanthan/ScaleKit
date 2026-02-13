@@ -39,19 +39,19 @@ export function TableOfContents({ toc }: TableOfContentsProps) {
     if (!toc?.length) return null;
 
     return (
-        <div className="space-y-2">
-            <p className="font-medium">On This Page</p>
-            <ul className="m-0 list-none">
+        <div className="space-y-4">
+            <p className="font-semibold text-sm tracking-tight text-foreground">On This Page</p>
+            <ul className="m-0 list-none text-sm space-y-2 border-l border-border/40 pl-4">
                 {toc.map((item) => (
-                    <li key={item.id} className="mt-0 pt-2">
+                    <li key={item.id} className="mt-0 pt-0">
                         <a
                             href={`#${item.id}`}
                             className={cn(
-                                "inline-block no-underline transition-colors hover:text-foreground",
-                                item.level === 3 ? "pl-4" : "",
+                                "inline-block no-underline transition-all hover:text-foreground relative -ml-[17px] pl-4 border-l-2 border-transparent py-1",
+                                item.level === 3 ? "pl-8" : "",
                                 item.id === activeId
-                                    ? "font-medium text-foreground"
-                                    : "text-muted-foreground"
+                                    ? "font-medium text-foreground border-l-foreground"
+                                    : "text-muted-foreground hover:border-l-foreground/50"
                             )}
                         >
                             {item.title}

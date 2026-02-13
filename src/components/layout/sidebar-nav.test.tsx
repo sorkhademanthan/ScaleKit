@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { DocsSidebarNav } from './sidebar-nav';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+// Mock usePathname
+vi.mock('next/navigation', () => ({
+    usePathname: () => '/docs/intro',
+}));
 
 describe('DocsSidebarNav', () => {
     const mockItems = [
@@ -25,7 +30,7 @@ describe('DocsSidebarNav', () => {
     ];
 
     it('renders sidebar navigation items correctly', () => {
-        render(<DocsSidebarNav items={mockItems} pathname="/docs/intro" />);
+        render(<DocsSidebarNav items={mockItems} />);
 
         // Check for category titles
         expect(screen.getByText('Getting Started')).toBeInTheDocument();
@@ -44,7 +49,7 @@ describe('DocsSidebarNav', () => {
     });
 
     it('renders empty when no items provided', () => {
-        const { container } = render(<DocsSidebarNav items={[]} pathname="/docs/intro" />);
+        const { container } = render(<DocsSidebarNav items={[]} />);
         expect(container).toBeEmptyDOMElement();
     });
 });

@@ -28,8 +28,9 @@ export default async function DocPage({ params }: PageProps) {
         const toc = getTableOfContents(doc.content);
 
         return (
-            <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
-                <div className="mx-auto w-full min-w-0">
+            <div className="relative xl:grid xl:grid-cols-[1fr_250px] gap-8">
+                {/* Main Content Column */}
+                <div className="mx-auto w-full min-w-0 max-w-3xl">
                     <div className="mb-4 flex items-center space-x-1 text-sm text-neutral-500">
                         <div className="truncate">Docs</div>
                         <svg
@@ -72,12 +73,13 @@ export default async function DocPage({ params }: PageProps) {
                     </div>
                 </div>
 
-                <div className="hidden text-sm xl:block">
-                    <div className="sticky top-16 -mt-10 h-[calc(100vh-3.5rem)] overflow-hidden pt-6">
+                {/* Table of Contents Column */}
+                <div className="hidden text-sm xl:block pl-6 border-l border-border/40">
+                    <div className="sticky top-20 h-[calc(100vh-3.5rem)] overflow-hidden">
                         <TableOfContents toc={toc} />
                     </div>
                 </div>
-            </main>
+            </div>
         );
     } catch (error) {
         notFound();
