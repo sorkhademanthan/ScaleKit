@@ -1,0 +1,23 @@
+---
+title: Database Schema
+description: Best practices for database schema design in ScaleKit.
+---
+
+# Database Schema Design
+
+ScaleKit uses **PostgreSQL** with **Drizzle ORM** for type-safe schema management.
+
+## Guidelines
+
+- All tables should have `id`, `created_at`, and `updated_at`.
+- Use snake_case for column names.
+- Define foreign key constraints properly.
+
+```typescript
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: text('name'),
+  email: text('email').unique(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+```

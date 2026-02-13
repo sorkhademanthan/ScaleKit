@@ -1,0 +1,19 @@
+---
+title: RBAC Setup
+description: Setting up Role-Based Access Control in ScaleKit.
+---
+
+# Role-Based Access Control (RBAC)
+
+RBAC allows granular permission management based on user roles (e.g., Admin, User, Guest).
+
+## Implementation
+
+We use a declarative approach to define role permissions.
+
+```typescript
+const roles = {
+  admin: ['read:users', 'write:users', 'delete:users'],
+  user: ['read:users'],
+};
+```
