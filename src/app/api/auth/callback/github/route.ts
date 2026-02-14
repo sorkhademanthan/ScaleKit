@@ -1,7 +1,6 @@
 import { authService } from "@/lib/auth-singleton";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 interface GitHubUser {
     id: number;
@@ -110,7 +109,7 @@ export async function GET(req: NextRequest) {
             maxAge: 60 * 60 * 24 * 7,
         });
 
-        return redirect("/dashboard");
+        return NextResponse.redirect(new URL("/dashboard", req.url));
 
     } catch (error) {
         console.error("OAuth Callback Error:", error);
