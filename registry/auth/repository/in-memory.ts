@@ -12,7 +12,17 @@ export class InMemoryUserRepository implements UserRepository {
     }
 
     async create(user: User): Promise<User> {
+        // Ensure new fields are handled if present (interface matches)
         this.users.push(user);
         return user;
+    }
+
+    async update(id: string, data: Partial<User>): Promise<User> {
+        const index = this.users.findIndex(u => u.id === id);
+        if (index === -1) throw new Error('User not found');
+
+        const updatedUser = { ...this.users[index], ...data, updatedAt: new Date() };
+        this.users[index] = updatedUser as User; // Cast to ensure
+        return updatedUser as User;
     }
 }

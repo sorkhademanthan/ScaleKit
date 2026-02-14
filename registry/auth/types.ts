@@ -11,7 +11,10 @@ export interface User {
     id: string;
     email: string;
     role: Role;
-    passwordHash: string; // Stored securely
+    passwordHash: string | null; // Stored securely, now nullable for OAuth
+    name?: string | null;
+    image?: string | null;
+    githubId?: string | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -36,4 +39,5 @@ export interface UserRepository {
     findByEmail(email: string): Promise<User | null>;
     findById(id: string): Promise<User | null>;
     create(user: User): Promise<User>;
+    update?(id: string, data: Partial<User>): Promise<User>;
 }

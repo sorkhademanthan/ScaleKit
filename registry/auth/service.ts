@@ -56,16 +56,73 @@ export class AuthService {
             throw new AuthError('INVALID_CREDENTIALS', 'Invalid email or password');
         }
 
-        // 2. Verify password
+        // 2. Verify existence of password hash (OAuth users might not have one)
+        if (!user.passwordHash) {
+            throw new AuthError('INVALID_CREDENTIALS', 'Invalid email or password');
+        }
+
+        // 3. Verify password
         const isValid = await verifyPassword(password, user.passwordHash);
         if (!isValid) {
             throw new AuthError('INVALID_CREDENTIALS', 'Invalid email or password');
         }
 
-        // 3. Generate token
+        // 4. Generate token
         const token = signToken({ userId: user.id, role: user.role });
 
-        // 4. Return result
+        // 5. Return result
+        const { passwordHash: _, ...safeUser } = user;
+        return { user: safeUser, token };
+    }
+
+    /**
+     * Authenticates or Registers a user via OAuth provider (e.g. GitHub).
+     */
+    async loginWithGithub(email: string, githubId: string, name: string | null, avatarUrl: string | null): Promise<AuthResult> {
+        // 1. Check if user exists by GitHub ID (Best match)
+        // Since `findByGithubId` is not standard on UserRepository interface yet,
+        // we can cast or extend types, or just rely on email for MVP if repository doesn't support it strictly.
+        // But for Drizzle repo we specifically added it.
+
+        let user: User | null = null;
+
+        // Try to find by email first (common identifier)
+        // In a real OAuth flow, we'd prefer findByProviderId to handle email changes,
+        // but email linking is standard for MVP.
+        user = await this.userRepository.findByEmail(email);
+
+        if (user) {
+            // User exists.
+            // If user doesn't have githubId set, we should link it?
+            // For now, just login.
+            // Ideally update the user with latest name/avatar if missing.
+
+            // Check if we need to update githubId or profile
+            if (this.userRepository.update && (!user.githubId || !user.image || !user.name)) {
+                user = await this.userRepository.update(user.id, {
+                    githubId: user.githubId || githubId,
+                    name: user.name || name,
+                    image: user.image || avatarUrl
+                });
+            }
+        } else {
+            // Create new user
+            const newUser: User = {
+                id: crypto.randomUUID(),
+                email,
+                role: 'user',
+                passwordHash: null, // No password for OAuth users
+                githubId,
+                name,
+                image: avatarUrl,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            user = await this.userRepository.create(newUser);
+        }
+
+        // Generate token
+        const token = signToken({ userId: user.id, role: user.role });
         const { passwordHash: _, ...safeUser } = user;
         return { user: safeUser, token };
     }
