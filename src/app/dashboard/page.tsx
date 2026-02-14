@@ -11,6 +11,7 @@ import {
     Settings,
     Users
 } from "lucide-react";
+import { LogoutButton } from "@/components/auth/logout-button";
 
 export default async function DashboardPage() {
     const cookieStore = await cookies();
@@ -52,7 +53,7 @@ export default async function DashboardPage() {
             <div className="grid lg:grid-cols-5 min-h-[calc(100vh-4rem)]">
                 {/* Sidebar Navigation */}
                 <aside className="hidden lg:block border-r bg-background/50">
-                    <nav className="grid gap-2 p-4 text-sm font-medium">
+                    <nav className="flex flex-col gap-2 p-4 text-sm font-medium h-full">
                         <Link href="/dashboard" className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-foreground transition-all hover:text-foreground">
                             <LayoutDashboard className="h-4 w-4" />
                             Overview
@@ -69,6 +70,9 @@ export default async function DashboardPage() {
                             <Settings className="h-4 w-4" />
                             Settings
                         </Link>
+                        <div className="mt-auto pt-4 border-t">
+                            <LogoutButton />
+                        </div>
                     </nav>
                 </aside>
 
@@ -131,6 +135,6 @@ export default async function DashboardPage() {
                     </div>
                 </main>
             </div>
-        </div>
+        </div >
     );
 }

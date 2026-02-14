@@ -79,23 +79,15 @@ export class AuthService {
      * Authenticates or Registers a user via OAuth provider (e.g. GitHub).
      */
     async loginWithGithub(email: string, githubId: string, name: string | null, avatarUrl: string | null): Promise<AuthResult> {
-        // 1. Check if user exists by GitHub ID (Best match)
-        // Since `findByGithubId` is not standard on UserRepository interface yet,
-        // we can cast or extend types, or just rely on email for MVP if repository doesn't support it strictly.
-        // But for Drizzle repo we specifically added it.
+        // Shared logic, could be extracted to generic "loginWithOAuth" if providers grow
 
         let user: User | null = null;
 
         // Try to find by email first (common identifier)
-        // In a real OAuth flow, we'd prefer findByProviderId to handle email changes,
-        // but email linking is standard for MVP.
         user = await this.userRepository.findByEmail(email);
 
         if (user) {
             // User exists.
-            // If user doesn't have githubId set, we should link it?
-            // For now, just login.
-            // Ideally update the user with latest name/avatar if missing.
 
             // Check if we need to update githubId or profile
             if (this.userRepository.update && (!user.githubId || !user.image || !user.name)) {
@@ -122,6 +114,45 @@ export class AuthService {
         }
 
         // Generate token
+        const token = signToken({ userId: user.id, role: user.role });
+        const { passwordHash: _, ...safeUser } = user;
+        return { user: safeUser, token };
+    }
+
+    /**
+     * Authenticates or Registers a user via Google OAuth.
+     */
+    async loginWithGoogle(email: string, googleId: string, name: string | null, avatarUrl: string | null): Promise<AuthResult> {
+        let user: User | null = null;
+
+        // Try to find by email first
+        user = await this.userRepository.findByEmail(email);
+
+        if (user) {
+            // User exists
+            if (this.userRepository.update && (!user.googleId || !user.image || !user.name)) {
+                user = await this.userRepository.update(user.id, {
+                    googleId: user.googleId || googleId,
+                    name: user.name || name,
+                    image: user.image || avatarUrl
+                });
+            }
+        } else {
+            // Create new user
+            const newUser: User = {
+                id: crypto.randomUUID(),
+                email,
+                role: 'user',
+                passwordHash: null,
+                googleId,
+                name,
+                image: avatarUrl,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            };
+            user = await this.userRepository.create(newUser);
+        }
+
         const token = signToken({ userId: user.id, role: user.role });
         const { passwordHash: _, ...safeUser } = user;
         return { user: safeUser, token };

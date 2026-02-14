@@ -15,6 +15,7 @@ export interface User {
     name?: string | null;
     image?: string | null;
     githubId?: string | null;
+    googleId?: string | null;
     createdAt: Date;
     updatedAt: Date;
 }

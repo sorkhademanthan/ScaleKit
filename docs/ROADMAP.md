@@ -2,13 +2,17 @@
 
 We will tackle the remaining core features sequentially to transition from a technical prototype to a complete product.
 
-## Phase 3: OAuth Integration (GitHub)
-- **Goal**: Allow users to sign up/login with one click using their GitHub account.
+## Phase 3: OAuth Integration (GitHub and Google)
+- **Goal**: Allow users to sign up/login with one click using their GitHub or Google account.
 - **Tasks**:
-    1.  **Schema Update**: Add `github_id` and `avatar_url` to `users` table.
-    2.  **Infrastructure**: Register a GitHub OAuth App and get Client ID/Secret.
-    3.  **Backend Logic**: creating `GET /api/auth/github` (redirect) and `GET /api/auth/github/callback`.
-    4.  **Frontend**: Wire up the "Continue with GitHub" button.
+    1.  **Schema Update**: Add `github_id` and `avatar_url` to `users` table. (DONE)
+    2.  **Infrastructure**: Register a GitHub OAuth App and get Client ID/Secret. (DONE)
+    3.  **Backend Logic**: creating `GET /api/auth/github` (redirect) and `GET /api/auth/callback/github`. (DONE)
+    4.  **Google Integration**:
+        - **Schema**: Add `google_id` to `users` table.
+        - **Infra**: Get Google Cloud Credentials.
+        - **Backend**: Create `/api/auth/google` and `/api/auth/callback/google`.
+    5.  **Frontend**: Wire up the "Continue with GitHub" and "Continue with Google" buttons.
 
 ## Phase 4: User Settings & Profile
 - **Goal**: Enable users to manage their identity (Name, Avatar).
@@ -34,5 +38,5 @@ We will tackle the remaining core features sequentially to transition from a tec
 
 ---
 
-**Current Focus: Phase 3 (OAuth Integration)**
-Let's make that "Continue with GitHub" button functional.
+**Current Focus: Phase 3 (Google OAuth Integration)**
+Let's add the "Continue with Google" button.

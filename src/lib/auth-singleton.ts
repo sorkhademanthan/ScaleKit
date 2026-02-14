@@ -71,10 +71,15 @@ class LazyAuthService {
     }
 
     // Explicitly proxy the new loginWithGithub method
-    // Since we cast to AuthService, TS expects it, but at runtime it needs to exist on this proxy.
     async loginWithGithub(email: string, githubId: string, name: string | null, avatarUrl: string | null): Promise<any> {
         const svc = await this.getService();
         return svc.loginWithGithub(email, githubId, name, avatarUrl);
+    }
+
+    // Explicitly proxy the new loginWithGoogle method
+    async loginWithGoogle(email: string, googleId: string, name: string | null, avatarUrl: string | null): Promise<any> {
+        const svc = await this.getService();
+        return svc.loginWithGoogle(email, googleId, name, avatarUrl);
     }
 }
 

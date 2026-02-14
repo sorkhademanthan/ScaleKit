@@ -29,6 +29,7 @@ export class DrizzleUserRepository implements UserRepository {
             name: inputUser.name,
             image: inputUser.image,
             githubId: inputUser.githubId,
+            googleId: inputUser.googleId,
             createdAt: inputUser.createdAt,
             updatedAt: inputUser.updatedAt
         }).returning();

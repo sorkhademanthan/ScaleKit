@@ -7,6 +7,7 @@ export const users = pgTable("users", {
     name: text("name"), // Optional name
     image: text("image"), // Optional avatar URL
     githubId: varchar("github_id", { length: 255 }).unique(), // Store GitHub User ID
+    googleId: varchar("google_id", { length: 255 }).unique(), // Store Google User ID
     role: text("role").default("user").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
