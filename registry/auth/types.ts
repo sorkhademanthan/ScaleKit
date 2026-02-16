@@ -1,15 +1,22 @@
 export type Role = 'admin' | 'user' | 'guest';
 
 export type Permission =
+    // User Management
     | 'read:users'
     | 'write:users'
     | 'delete:users'
+    // Content Management (Posts/Articles)
     | 'read:posts'
-    | 'write:posts';
+    | 'write:posts'
+    | 'delete:posts'
+    // System Settings
+    | 'manage:settings'
+    | 'view:analytics';
 
 export interface User {
     id: string;
     email: string;
+    emailVerified?: Date | null;
     role: Role;
     passwordHash: string | null; // Stored securely, now nullable for OAuth
     name?: string | null;

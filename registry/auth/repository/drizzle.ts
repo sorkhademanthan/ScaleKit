@@ -24,6 +24,7 @@ export class DrizzleUserRepository implements UserRepository {
         const result = await db.insert(users).values({
             id: inputUser.id,
             email: inputUser.email,
+            emailVerified: inputUser.emailVerified,
             passwordHash: inputUser.passwordHash,
             role: inputUser.role, // Assuming schema role is string or compatible
             name: inputUser.name,

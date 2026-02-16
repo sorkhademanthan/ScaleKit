@@ -12,6 +12,7 @@ import {
     Users
 } from "lucide-react";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { hasPermission } from "@registry/auth/rbac";
 
 export default async function DashboardPage() {
     const cookieStore = await cookies();
@@ -87,6 +88,13 @@ export default async function DashboardPage() {
                         </div>
                     </div>
 
+                    {!user.emailVerified && (
+                        <div className="bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500 text-yellow-700 dark:text-yellow-400 p-4 rounded-r shadow-sm" role="alert">
+                            <p className="font-bold">Email not verified</p>
+                            <p>Please check your email inbox to verify your account.</p>
+                        </div>
+                    )}
+
                     {/* Stats Grid */}
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                         {[
@@ -123,13 +131,19 @@ export default async function DashboardPage() {
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium leading-none">{user.email}</p>
-                                        <p className="text-sm text-muted-foreground">{user.role}</p>
+                                        <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
                                     </div>
                                 </div>
                                 <div className="pt-4 border-t">
                                     <div className="text-xs text-muted-foreground">User ID:</div>
                                     <div className="text-xs font-mono bg-muted p-1 rounded mt-1">{user.id}</div>
                                 </div>
+
+                                {hasPermission({ role: user.role } as any, 'view:analytics') && (
+                                    <div className="pt-4 border-t">
+                                        <p className="text-xs text-green-600 font-medium">✨ Admin Analytics Access</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

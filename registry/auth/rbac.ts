@@ -8,11 +8,15 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
         'delete:users',
         'read:posts',
         'write:posts',
+        'delete:posts',
+        'manage:settings',
+        'view:analytics',
     ],
     user: [
         'read:users', // Users can read other users (public profiles)
         'read:posts',
-        'write:posts',
+        'write:posts', // Users can create posts
+        // No delete:posts or manage:settings
     ],
     guest: [
         'read:posts',
@@ -28,6 +32,10 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
  */
 export function hasPermission(actor: User | Role, permission: Permission): boolean {
     const role = typeof actor === 'string' ? actor : actor.role;
+
+    // Direct role check shortcut for admins
+    if (role === 'admin') return true;
+
     const permissions = ROLE_PERMISSIONS[role] || [];
     return permissions.includes(permission);
 }
