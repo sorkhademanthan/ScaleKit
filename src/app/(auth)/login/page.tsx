@@ -87,7 +87,7 @@ export default function LoginPage() {
                         >
                             Password
                         </label>
-                        <Link href="#" className="text-xs text-foreground hover:underline underline-offset-4">
+                        <Link href="/forgot-password" className="text-xs text-foreground hover:underline underline-offset-4">
                             Forgot password?
                         </Link>
                     </div>
