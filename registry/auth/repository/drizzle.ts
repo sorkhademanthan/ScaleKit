@@ -27,6 +27,7 @@ export class DrizzleUserRepository implements UserRepository {
             passwordHash: inputUser.passwordHash,
             role: inputUser.role, // Assuming schema role is string or compatible
             name: inputUser.name,
+            bio: inputUser.bio,
             image: inputUser.image,
             githubId: inputUser.githubId,
             googleId: inputUser.googleId,

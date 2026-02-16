@@ -14,6 +14,7 @@ export interface User {
     passwordHash: string | null; // Stored securely, now nullable for OAuth
     name?: string | null;
     image?: string | null;
+    bio?: string | null;
     githubId?: string | null;
     googleId?: string | null;
     createdAt: Date;

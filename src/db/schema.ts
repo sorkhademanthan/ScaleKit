@@ -6,6 +6,7 @@ export const users = pgTable("users", {
     passwordHash: text("password_hash"), // Nullable for OAuth-only users
     name: text("name"), // Optional name
     image: text("image"), // Optional avatar URL
+    bio: text("bio"), // Optional bio
     githubId: varchar("github_id", { length: 255 }).unique(), // Store GitHub User ID
     googleId: varchar("google_id", { length: 255 }).unique(), // Store Google User ID
     role: text("role").default("user").notNull(),
