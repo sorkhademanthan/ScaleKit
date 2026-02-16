@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { workspaces, members, users } from "@/db/schema"; // Ensure imports are correct and available
+import { workspaces, members, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export class WorkspaceService {
@@ -80,5 +80,20 @@ export class WorkspaceService {
             workspaceId,
             role,
         });
+    }
+
+    // 6. Get All Members (for settings page)
+    static async getMembers(workspaceId: string) {
+        const results = await db.select({
+            user: users,
+            role: members.role,
+            joinedAt: members.joinedAt
+        })
+            .from(members)
+            .innerJoin(users, eq(members.userId, users.id))
+            .where(eq(members.workspaceId, workspaceId));
+
+        // Use any map logic if we want to sanitize user object further
+        return results;
     }
 }
