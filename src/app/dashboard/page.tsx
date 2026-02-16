@@ -54,7 +54,7 @@ export default async function DashboardPage() {
                 {/* Sidebar Navigation */}
                 <aside className="hidden lg:block border-r bg-background/50">
                     <nav className="flex flex-col gap-2 p-4 text-sm font-medium h-full">
-                        <Link href="/dashboard" className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-foreground transition-all hover:text-foreground">
+                        <Link href="/dashboard" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground hover:bg-muted/50">
                             <LayoutDashboard className="h-4 w-4" />
                             Overview
                         </Link>
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
                             <Activity className="h-4 w-4" />
                             Activity
                         </Link>
-                        <Link href="#" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground hover:bg-muted/50">
+                        <Link href="/dashboard/settings" className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-foreground hover:bg-muted/50">
                             <Settings className="h-4 w-4" />
                             Settings
                         </Link>
