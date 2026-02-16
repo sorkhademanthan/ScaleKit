@@ -4,6 +4,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Metadata } from "next";
+import { PermissionGuard } from "@/components/auth/permission-guard";
 
 export const metadata: Metadata = {
     title: "Settings - ScaleKit",
@@ -47,6 +48,26 @@ export default async function SettingsPage() {
                     <ModeToggle />
                 </div>
             </div>
+
+            {/* Admin Only Section Example */}
+            <PermissionGuard permission="manage:settings">
+                <div className="border-t pt-6 max-w-2xl mt-8">
+                    <div className="flex flex-col space-y-1.5 mb-6">
+                        <h3 className="font-semibold text-xl leading-none tracking-tight text-red-600">Admin Controls</h3>
+                        <p className="text-sm text-muted-foreground">
+                            System-wide configuration only visible to Admins.
+                        </p>
+                    </div>
+                    <div className="p-6 border border-red-200 dark:border-red-900 rounded-lg bg-red-50 dark:bg-red-900/20 text-card-foreground shadow-sm">
+                        <p className="font-medium">Danger Zone</p>
+                        <div className="mt-4">
+                            <button className="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700">
+                                Reset System Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </PermissionGuard>
         </div>
     );
 }
