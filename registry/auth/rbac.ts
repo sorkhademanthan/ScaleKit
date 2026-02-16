@@ -15,7 +15,9 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     user: [
         'read:users', // Users can read other users (public profiles)
         'read:posts',
+        'read:posts',
         'write:posts', // Users can create posts
+        'manage:profile', // Users can manage their own profile
         // No delete:posts or manage:settings
     ],
     guest: [

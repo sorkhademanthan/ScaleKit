@@ -11,7 +11,9 @@ export type Permission =
     | 'delete:posts'
     // System Settings
     | 'manage:settings'
-    | 'view:analytics';
+    | 'view:analytics'
+    // User Self-Management
+    | 'manage:profile';
 
 export interface User {
     id: string;
