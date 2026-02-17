@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, UserPlus, X, Mail } from "lucide-react";
+import { Loader2, UserPlus, X, Mail, RefreshCw } from "lucide-react";
 import { InviteMemberDialog } from "@/components/workspace/invite-member-dialog";
+import { useAuth } from "@/components/providers/auth-provider";
 
 interface Member {
     user: {
@@ -24,30 +25,18 @@ interface Invite {
 }
 
 export default function MembersSettingsPage({ params }: { params: { slug: string } }) {
+    const { user: currentUser } = useAuth();
     const [slug, setSlug] = useState<string>("");
-    // We need to unwrap params in Next 15 if passing directly, 
-    // but this is a client component, so we can use useParams or await params if server passed props.
-    // Actually, page.tsx props are params promise in Next 15.
-    // But wait, this file is "page.tsx" so it's a Server Component by default unless "use client" is at top.
-    // I added "use client" at top.
-    // In Next.js 15, params is a Promise. We need to unwrap it with `use` or useEffect.
 
-    // Let's use `useParams` from next/navigation which is synchronous usually or easier in client components.
-    // Or handle the promise.
+    // We handle params unwrapping for safety
 
     const [members, setMembers] = useState<Member[]>([]);
     const [invites, setInvites] = useState<Invite[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isRefreshing, setIsRefreshing] = useState(false);
     const [isInviteOpen, setIsInviteOpen] = useState(false);
 
     useEffect(() => {
-        // Basic unwrapping if needed, or just use the prop. 
-        // If params is a promise, we need to await it. 
-        // But since we are in "use client", the props passed from layout might be already resolved?
-        // Actually, distinct page.tsx in dashboard/[slug] gets params.
-        // Let's assume params.slug works or use standard fetch pattern.
-
-        // Safer:
         const loadData = async () => {
             try {
                 // Next 15: params is a promise
@@ -66,6 +55,7 @@ export default function MembersSettingsPage({ params }: { params: { slug: string
     }, [params]);
 
     async function fetchMembers(currentSlug: string) {
+        if (!currentSlug) return;
         const res = await fetch(`/api/workspaces/${currentSlug}/members`);
         if (res.ok) {
             const data = await res.json();
@@ -74,11 +64,19 @@ export default function MembersSettingsPage({ params }: { params: { slug: string
     }
 
     async function fetchInvites(currentSlug: string) {
+        if (!currentSlug) return;
         const res = await fetch(`/api/workspaces/${currentSlug}/invites`);
         if (res.ok) {
             const data = await res.json();
             setInvites(data.invites);
         }
+    }
+
+    async function handleRefresh() {
+        if (!slug) return;
+        setIsRefreshing(true);
+        await Promise.all([fetchMembers(slug), fetchInvites(slug)]);
+        setIsRefreshing(false);
     }
 
     if (isLoading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin text-muted-foreground" /></div>;
@@ -90,13 +88,22 @@ export default function MembersSettingsPage({ params }: { params: { slug: string
                     <h2 className="text-2xl font-bold tracking-tight">Team Members</h2>
                     <p className="text-muted-foreground">Manage who has access to this workspace.</p>
                 </div>
-                <button
-                    onClick={() => setIsInviteOpen(true)}
-                    className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors bg-black text-white"
-                >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Invite User
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={handleRefresh}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input bg-background text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                        title="Refresh List"
+                    >
+                        <RefreshCw className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                    </button>
+                    <button
+                        onClick={() => setIsInviteOpen(true)}
+                        className="inline-flex h-9 items-center justify-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90 transition-colors"
+                    >
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Invite User
+                    </button>
+                </div>
             </div>
 
             <InviteMemberDialog
@@ -110,31 +117,38 @@ export default function MembersSettingsPage({ params }: { params: { slug: string
 
             {/* Members List */}
             <div className="rounded-md border bg-background">
-                <div className="p-4 border-b bg-muted/30 font-medium text-sm">Active Members ({members.length})</div>
+                <div className="p-4 border-b bg-muted/30 font-medium text-sm flex justify-between items-center">
+                    <span>Active Members ({members.length})</span>
+                </div>
                 <div className="divide-y">
-                    {members.map((member) => (
-                        <div key={member.user.id} className="flex items-center justify-between p-4">
-                            <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-                                    {member.user.image ? (
-                                        <img src={member.user.image} alt={member.user.name || ""} className="rounded-full" />
-                                    ) : (
-                                        (member.user.name || member.user.email).charAt(0).toUpperCase()
-                                    )}
+                    {members.map((member) => {
+                        const isMe = currentUser?.id === member.user.id;
+                        return (
+                            <div key={member.user.id} className={`flex items-center justify-between p-4 ${isMe ? "bg-muted/10" : ""}`}>
+                                <div className="flex items-center gap-3">
+                                    <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-sm font-medium overflow-hidden">
+                                        {member.user.image ? (
+                                            <img src={member.user.image} alt={member.user.name || ""} className="h-full w-full object-cover" />
+                                        ) : (
+                                            (member.user.name || member.user.email).charAt(0).toUpperCase()
+                                        )}
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-sm flex items-center gap-2">
+                                            {member.user.name || "User"}
+                                            {isMe && <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">YOU</span>}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">{member.user.email}</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div className="font-medium text-sm">{member.user.name || "User"}</div>
-                                    <div className="text-xs text-muted-foreground">{member.user.email}</div>
+                                <div className="flex items-center gap-4">
+                                    <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 capitalize">
+                                        {member.role}
+                                    </span>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                                <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 capitalize">
-                                    {member.role}
-                                </span>
-                                {/* Add Manage Menu Here (Remove, Change Role) */}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
 

@@ -108,4 +108,16 @@ export class InviteService {
     static async revokeInvite(inviteId: string) {
         await db.delete(invitations).where(eq(invitations.id, inviteId));
     }
+
+    // 5. Get Pending Invites for User Email
+    // Fetches invites sent to this user's email, including workspace details
+    static async getUserInvites(email: string) {
+        return await db.query.invitations.findMany({
+            where: and(eq(invitations.email, email), eq(invitations.status, 'pending')),
+            with: {
+                workspace: true,
+                inviter: true,
+            }
+        });
+    }
 }

@@ -1,4 +1,5 @@
-import { pgTable, text, timestamp, uuid, varchar, primaryKey, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, varchar, primaryKey, uniqueIndex, pgEnum } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm"; // Add relations
 
 // Define Enums
 export const roleEnum = pgEnum('role', ['owner', 'admin', 'member']);
@@ -37,13 +38,8 @@ export const members = pgTable("members", {
     role: roleEnum("role").default('member').notNull(),
     joinedAt: timestamp("joined_at").defaultNow().notNull(),
 }, (t) => ({
-    // Constraint: A user can verify be in a workspace once
-    unq: primaryKey({ columns: [t.userId, t.workspaceId] }),
-    // Also keep ID as unique handle if needed, but composite PK is often better for join tables. 
-    // However, Drizzle usually prefers single PK for some operations. 
-    // Let's stick to standard practice: ID is PK, unique constraint on user+workspace.
-    // Wait, create table definitions above says "id: UUID (PK)". 
-    // So we should add a unique index on userId + workspaceId instead.
+    // Use uniqueIndex instead of primaryKey because 'id' is already the PK
+    unq: uniqueIndex("members_user_workspace_unique").on(t.userId, t.workspaceId),
 }));
 
 export const invitations = pgTable("invitations", {
@@ -77,6 +73,39 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
     expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// RELATIONS
+export const usersRelations = relations(users, ({ one, many }) => ({
+    members: many(members),
+    createdWorkspaces: many(members), // Technicaly, ownership is determined by role in members, but we might want this if we had a creator_id on workspace
+}));
+
+export const workspacesRelations = relations(workspaces, ({ many }) => ({
+    members: many(members),
+    invitations: many(invitations),
+}));
+
+export const membersRelations = relations(members, ({ one }) => ({
+    user: one(users, {
+        fields: [members.userId],
+        references: [users.id],
+    }),
+    workspace: one(workspaces, {
+        fields: [members.workspaceId],
+        references: [workspaces.id],
+    }),
+}));
+
+export const invitationsRelations = relations(invitations, ({ one }) => ({
+    workspace: one(workspaces, {
+        fields: [invitations.workspaceId],
+        references: [workspaces.id],
+    }),
+    inviter: one(users, {
+        fields: [invitations.inviterId],
+        references: [users.id],
+    }),
+}));
 
 // TYPES
 export type User = typeof users.$inferSelect;

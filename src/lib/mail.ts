@@ -3,13 +3,17 @@ import { ResetPasswordEmail } from "@/emails/reset-password";
 import { InviteEmail } from "@/emails/invite-email";
 import { render } from "@react-email/render";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend safely
+const resend = process.env.RESEND_API_KEY
+    ? new Resend(process.env.RESEND_API_KEY)
+    : null;
+
 const domain = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 export const sendVerificationEmail = async (email: string, token: string) => {
     const confirmLink = `${domain}/auth/new-verification?token=${token}`;
 
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
         console.warn("RESEND_API_KEY is missing. VERIFICATION LINK:", confirmLink);
         return;
     }
@@ -29,7 +33,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 export const sendPasswordResetEmail = async (email: string, token: string, name?: string) => {
     const resetLink = `${domain}/auth/reset-password?token=${token}`;
 
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
         console.warn("RESEND_API_KEY is missing. RESET LINK:", resetLink);
         return;
     }
@@ -57,7 +61,7 @@ export const sendPasswordResetEmail = async (email: string, token: string, name?
 export const sendInviteEmail = async (email: string, inviteToken: string, inviterName: string, workspaceName: string) => {
     const inviteLink = `${domain}/invites/${inviteToken}`;
 
-    if (!process.env.RESEND_API_KEY) {
+    if (!resend) {
         console.warn("RESEND_API_KEY is missing. INVITE LINK:", inviteLink);
         return;
     }

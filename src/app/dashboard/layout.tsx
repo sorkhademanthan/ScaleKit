@@ -6,6 +6,7 @@ import { AuthProvider } from "@/components/providers/auth-provider";
 import { User } from "@registry/auth/types";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { WorkspaceService } from "@/modules/workspace/workspace.service";
+import { PendingInvitesAlert } from "@/components/dashboard/pending-invites-alert";
 
 export default async function DashboardLayout({
     children,
@@ -56,7 +57,8 @@ export default async function DashboardLayout({
                     <AppSidebar workspaces={workspaces} />
 
                     {/* Main Content Area */}
-                    <main className="lg:col-span-4 p-8 space-y-8 animate-fade-in">
+                    <main className="lg:col-span-4 p-8 space-y-8 animate-fade-in relative">
+                        <PendingInvitesAlert />
                         {children}
                     </main>
                 </div>

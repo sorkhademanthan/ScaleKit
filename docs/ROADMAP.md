@@ -23,29 +23,34 @@ We are tackling core features sequentially to transition from a technical protot
 
 ---
 
-## 🚧 Phase 7: Password Reset (Next Priority?)
+## ✅ Phase 7: Password Reset
 - **Goal**: Allow users to recover lost passwords securely.
-- **Tasks**:
-    1.  **Schema**: Add `reset_token` and `reset_token_expires` to database.
-    2.  **API**: `POST /api/auth/forgot-password` (sends email) and `POST /api/auth/reset-password` (updates DB).
-    3.  **UI**: "Forgot Password" link on login page, and a Reset Password form page.
-    4.  **Email**: Create transactional email template for reset links.
+- **Status**: Completed. Reset token flow, email templates, and secure API endpoints implemented.
 
-## 🔮 Phase 8: Core Product - Workspaces (Teams)
+## ✅ Phase 8: Core Product - Workspaces (Teams)
 - **Goal**: Allow users to organize their work in teams (Multi-tenancy).
-- **Tasks**:
-    1.  **Schema**: Create `workspaces` table and `workspace_members` join table.
-    2.  **API**: CRUD for workspaces, invite members.
-    3.  **UI**: Workspace switcher in the sidebar, Member management settings.
-    4.  **Middleware**: Ensure users only access data within their active workspace.
-
-## 🔮 Phase 9: Billing & Subscriptions (Stripe)
-- **Goal**: Monetize the application.
-- **Tasks**:
-    1.  **Schema**: Add `subscription_status`, `stripe_customer_id` to Workspaces (or Users).
-    2.  **Integration**: Stripe Checkout & Webhooks.
-    3.  **UI**: Pricing page and Billing portal.
+- **Status**: Completed. 
+    - Full workspace creation and switching logic.
+    - Member invites via email (Resend) and role management.
+    - Settings pages for workspace configuration.
 
 ---
 
-**Current Status**: Authentication is robust. Ready to move to **Phase 7 (Password Reset)** or start **Phase 8 (Workspaces)**.
+## 🚧 Phase 9: Billing & Subscriptions (Stripe) (Next Priority)
+- **Goal**: Monetize the application.
+- **Tasks**:
+    1.  **Schema**: Add `subscription_status`, `stripe_customer_id`, `plan` to Workspaces table.
+    2.  **Integration**: Stripe Checkout (for upgrades) & Webhooks (for listening to payment events).
+    3.  **UI**: Pricing page (public) and Billing portal (internal settings).
+    4.  **Logic**: Enforce plan limits (e.g. "Free plan has max 3 members").
+
+## 🔮 Phase 10: Advanced Features
+- **Goal**: Polish and production readiness.
+- **Tasks**:
+    1.  **Activity Logs**: Track user actions for audits.
+    2.  **API Keys**: Allow users to generate API keys for programmatic access.
+    3.  **Rate Limiting**: Protect API routes.
+
+---
+
+**Current Status**: Multi-tenancy is fully operational. Ready to start **Phase 9 (Billing/Stripe)**.

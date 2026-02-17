@@ -36,9 +36,9 @@ export function AppSidebar({ workspaces, className }: AppSidebarProps) {
         },
         {
             title: "Team Members",
-            href: `${baseUrl}/members`,
+            href: `${baseUrl}/settings/members`,
             icon: Users,
-            active: pathname?.startsWith(`${baseUrl}/members`),
+            active: pathname?.startsWith(`${baseUrl}/settings/members`),
         },
         {
             title: "Activity",
@@ -50,7 +50,7 @@ export function AppSidebar({ workspaces, className }: AppSidebarProps) {
             title: "Settings",
             href: `${baseUrl}/settings`,
             icon: Settings,
-            active: pathname?.startsWith(`${baseUrl}/settings`),
+            active: pathname === `${baseUrl}/settings`,
         },
     ];
 
