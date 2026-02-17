@@ -36,21 +36,33 @@ We are tackling core features sequentially to transition from a technical protot
 
 ---
 
-## 🚧 Phase 9: Billing & Subscriptions (Stripe) (Next Priority)
+## ⏭️ Phase 9: Billing & Subscriptions (Stripe) (Deferred)
 - **Goal**: Monetize the application.
-- **Tasks**:
-    1.  **Schema**: Add `subscription_status`, `stripe_customer_id`, `plan` to Workspaces table.
-    2.  **Integration**: Stripe Checkout (for upgrades) & Webhooks (for listening to payment events).
-    3.  **UI**: Pricing page (public) and Billing portal (internal settings).
-    4.  **Logic**: Enforce plan limits (e.g. "Free plan has max 3 members").
-
-## 🔮 Phase 10: Advanced Features
-- **Goal**: Polish and production readiness.
-- **Tasks**:
-    1.  **Activity Logs**: Track user actions for audits.
-    2.  **API Keys**: Allow users to generate API keys for programmatic access.
-    3.  **Rate Limiting**: Protect API routes.
+- **Status**: Deferred for later.
+- **Pending Tasks**:
+    1.  **Schema**: Add `subscription_status`, `stripe_customer_id`, `plan`.
+    2.  **Integration**: Stripe Checkout & Webhooks.
+    3.  **UI**: Pricing page and Billing portal.
 
 ---
 
-**Current Status**: Multi-tenancy is fully operational. Ready to start **Phase 9 (Billing/Stripe)**.
+## ✅ Phase 10: Advanced Features
+- **Goal**: Enhance platform capabilities with robust auditing and developer tools.
+- **Status**: Completed.
+    - **Activity Logs**: Full audit trail implemented with timeline UI.
+    - **API Keys**: Secure key generation, hashing, and management UI.
+    - **Rate Limiting**: Global API protection via Middleware (Upstash Redis + In-Memory Fallback).
+
+---
+
+## 🔮 Phase 11: Final Polish & Launch Prep
+- **Goal**: Ensure the application is rock-solid for production.
+- **Tasks**:
+    1.  **Code Cleanup**: Remove unused imports, console logs, and fix lint warnings.
+    2.  **UX Polish**: Verify all loading states, error boundaries, and mobile responsiveness.
+    3.  **Security Audit**: Verify headers, CORS, and sensitive data exposure.
+    4.  **Documentation**: Update README with deployment instructions.
+
+---
+
+**Current Status**: **Phase 10 Completed**. Core platform is feature-complete (except Billing). Ready for final polish.

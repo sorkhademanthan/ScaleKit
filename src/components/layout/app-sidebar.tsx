@@ -6,7 +6,8 @@ import {
     Activity,
     LayoutDashboard,
     Settings,
-    Users
+    Users,
+    Key
 } from "lucide-react";
 import { WorkspaceSwitcher } from "@/components/workspace/workspace-switcher";
 import { LogoutButton } from "@/components/auth/logout-button";
@@ -51,6 +52,12 @@ export function AppSidebar({ workspaces, className }: AppSidebarProps) {
             href: `${baseUrl}/settings`,
             icon: Settings,
             active: pathname === `${baseUrl}/settings`,
+        },
+        {
+            title: "API Keys",
+            href: `${baseUrl}/settings/api-keys`,
+            icon: Key,
+            active: pathname?.startsWith(`${baseUrl}/settings/api-keys`),
         },
     ];
 

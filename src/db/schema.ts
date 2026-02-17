@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, varchar, primaryKey, uniqueIndex, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, varchar, primaryKey, uniqueIndex, pgEnum, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm"; // Add relations
 
 // Define Enums
@@ -74,15 +74,41 @@ export const passwordResetTokens = pgTable("password_reset_tokens", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// 6. Activity Logs
+export const activityLogs = pgTable("activity_logs", {
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    action: text("action").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// 7. API Keys
+export const apiKeys = pgTable("api_keys", {
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    keyPrefix: text("key_prefix").notNull(),
+    keyHash: text("key_hash").notNull(),
+    lastUsedAt: timestamp("last_used_at", { mode: "date" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // RELATIONS
 export const usersRelations = relations(users, ({ one, many }) => ({
     members: many(members),
-    createdWorkspaces: many(members), // Technicaly, ownership is determined by role in members, but we might want this if we had a creator_id on workspace
+    createdWorkspaces: many(members),
+    activities: many(activityLogs),
 }));
 
 export const workspacesRelations = relations(workspaces, ({ many }) => ({
     members: many(members),
     invitations: many(invitations),
+    activities: many(activityLogs),
+    apiKeys: many(apiKeys), // Added relation
 }));
 
 export const membersRelations = relations(members, ({ one }) => ({
@@ -107,6 +133,24 @@ export const invitationsRelations = relations(invitations, ({ one }) => ({
     }),
 }));
 
+export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
+    workspace: one(workspaces, {
+        fields: [activityLogs.workspaceId],
+        references: [workspaces.id],
+    }),
+    actor: one(users, {
+        fields: [activityLogs.userId],
+        references: [users.id],
+    }),
+}));
+
+export const apiKeysRelations = relations(apiKeys, ({ one }) => ({
+    workspace: one(workspaces, {
+        fields: [apiKeys.workspaceId],
+        references: [workspaces.id],
+    }),
+}));
+
 // TYPES
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -114,3 +158,5 @@ export type Workspace = typeof workspaces.$inferSelect;
 export type NewWorkspace = typeof workspaces.$inferInsert;
 export type Member = typeof members.$inferSelect;
 export type Invitation = typeof invitations.$inferSelect;
+export type ActivityLog = typeof activityLogs.$inferSelect;
+export type ApiKey = typeof apiKeys.$inferSelect;

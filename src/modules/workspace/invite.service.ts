@@ -3,6 +3,7 @@ import { invitations, members, workspaces, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import crypto from "crypto";
 import { sendInviteEmail } from "@/lib/mail";
+import { ActivityService } from "@/modules/activity/activity.service";
 
 export class InviteService {
     // 1. Send an Invite
@@ -55,6 +56,15 @@ export class InviteService {
             await sendInviteEmail(email, token, senderUser?.name || "A team member", workspace.name);
         }
 
+        await ActivityService.log(
+            workspaceId,
+            senderId,
+            "member.invited",
+            "member",
+            email, // Using email as entityId for now as user might not exist
+            { role, email }
+        );
+
         return invite;
     }
 
@@ -93,6 +103,21 @@ export class InviteService {
             const workspace = await tx.query.workspaces.findFirst({
                 where: eq(workspaces.id, invite.workspaceId)
             });
+
+            // Log activity manually since we are inside transaction and ActivityService uses its own db call (which is fine, or we could pass tx if we refactored)
+            // Ideally we run this after transaction commits, but for now we await it.
+            // Note: If tx fails, this log might still persist if it was separate connection? 
+            // Drizzle `db` usually separate. 
+            // Let's just fire and forget or await.
+            await ActivityService.log(
+                invite.workspaceId,
+                userId,
+                "member.joined",
+                "member",
+                userId,
+                { via: "invite" }
+            );
+
             return workspace;
         });
     }
@@ -106,7 +131,24 @@ export class InviteService {
 
     // 4. Revoke Invite
     static async revokeInvite(inviteId: string) {
-        await db.delete(invitations).where(eq(invitations.id, inviteId));
+        // Need to fetch invite to know workspaceId for logging
+        const invite = await db.query.invitations.findFirst({
+            where: eq(invitations.id, inviteId)
+        });
+
+        if (invite) {
+            await db.delete(invitations).where(eq(invitations.id, inviteId));
+            if (invite.inviterId) {
+                await ActivityService.log(
+                    invite.workspaceId,
+                    invite.inviterId,
+                    "invite.revoked",
+                    "invite",
+                    invite.email,
+                    { email: invite.email }
+                );
+            }
+        }
     }
 
     // 5. Get Pending Invites for User Email

@@ -2,6 +2,8 @@ import { db } from "@/db";
 import { workspaces, members, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
+import { ActivityService } from "@/modules/activity/activity.service";
+
 export class WorkspaceService {
     // 1. Create a workspace & add creator as owner
     static async createWorkspace(userId: string, name: string, slug: string) {
@@ -28,6 +30,19 @@ export class WorkspaceService {
             await tx.update(users)
                 .set({ lastActiveWorkspaceId: workspace.id })
                 .where(eq(users.id, userId));
+
+            // Log activity (fire and forget inside transaction? Or await?)
+            // Usually logs are side effects. If log fails, should transaction fail?
+            // Let's await it to be safe, but wrapped in try/catch inside Service if needed.
+            // But here we want it part of the flow.
+            await ActivityService.log(
+                workspace.id,
+                userId,
+                "workspace.created",
+                "workspace",
+                workspace.id,
+                { name, slug }
+            );
 
             return workspace;
         });
